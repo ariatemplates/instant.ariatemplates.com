@@ -1,0 +1,109 @@
+extends layout
+
+block header_scripts
+  script(type="text/javascript", src='/aria/ariatemplates-1.4.4.js')
+
+block header
+  if (locals.admin)
+    .action(data-id=gist.id, onclick="window.instant.delete(this)")
+      form#delete(method="POST", action="/anonymous/"+gist.id+"/"+gist.admin_hash)
+        input(type="hidden", name="_method", value="delete")
+        i.icon-trash
+        span Delete
+
+    #share.action.menu
+      i.icon-share
+      span Share
+      ul
+        li Copy the public url
+          i.right.icon-paste.copy#public_url(data-clipboard-text="http://instant.ariatemplates.com/anonymous/#{gist.id}")
+        li Copy the private admin url
+          i.right.icon-paste.copy#private_url(data-clipboard-text="http://instant.ariatemplates.com/anonymous/#{gist.id}/#{gist.admin_hash}")
+
+
+mixin editor(title, type, file, content)
+  .panel(class=type)
+    header
+      h3 <i class="icon-code"></i> #{title}
+      .actions
+        i.icon-resize-full(title="Expand to full height", onclick="window.instant.edit.fullscreen('#{type}', this)")
+    if content
+      pre.code-wrap(id=type+"-editor")= content || get_default_content(type)
+    else
+      pre.code-wrap(id=type+"-editor")= (file && file.content) || get_default_content(type)
+
+block content
+  #splitter.splitter
+  #splitter-proxy.splitter-proxy.splitter-proxy-hidden
+  #code.code
+    mixin editor("Template", "tpl", gist.files["InstantTemplate.tpl"])
+    mixin editor("Template Script", "script", gist.files["InstantTemplateScript.js"])
+    mixin editor("CSS Template", "style", gist.files["InstantTemplateStyle.tpl.css"])
+    mixin editor("Data Model", "data", null, JSON.stringify(JSON.parse(gist.files["instant.json"].content).data, null, 2))
+
+  #preview-wrapper.preview
+    #preview.preview-wrapper
+
+prepend footer_right
+  span.link.kdb-help(title="Show keyboard shorcuts"): i.icon-keyboard(onclick="window.instant.show_keyboard_help()")
+
+block footer
+  span= date(gist.created_at, date_patterns.full)
+
+block scripts
+  script(type="text/javascript", src="/lib/ace/ace.js", charset="utf-8")
+  script(type="text/javascript", src="/scripts/splitter.js")
+  script(type="text/javascript", src="/scripts/errors.js")
+  script(type="text/javascript", src="/scripts/edit.js")
+
+  if locals.admin
+    script(type="text/javascript")
+      ZeroClipboard.setDefaults({moviePath: '/lib/ZeroClipboard.swf'});
+      var share = document.getElementById("share");
+      var public_url = new ZeroClipboard(document.getElementById("public_url"));
+      var private_url = new ZeroClipboard(document.getElementById("private_url"));
+
+      public_url.htmlBridge.onmouseover = function() { show_share(true); }
+      public_url.htmlBridge.onmouseout = function() { show_share(false); }
+
+      private_url.htmlBridge.onmouseover = function() { show_share(true); }
+      private_url.htmlBridge.onmouseout = function() { show_share(false); }
+
+
+      var show_share = function(type) {
+        share.classList[type?"add":"toggle"]("menu-show");
+      }
+
+
+      window.instant['delete'] = function(elem) {
+        var instant_id = elem.dataset.id;
+        var choice =  window.confirm("Are you sure you want to delete this instant ?");
+        if (choice) {
+          window.locals.remove(instant_id);
+          instant.$("delete").submit();
+        }
+      };
+
+  script(type="text/javascript")
+    aria.core.AppEnvironment.setEnvironment({
+      defaultWidgetLibs : {
+        "aria" : "aria.widgets.AriaLib",
+        "html" : "aria.html.HtmlLibrary"
+      }
+    });
+    Aria.load({
+      classes:["aria.templates.CSSClassGenerator"],
+      oncomplete:{
+        fn: function () {
+          // loading fake template to get necessary dependencies
+          Aria.loadTemplate(
+            { classpath: "A", div: "preview", data:{}},
+            function() {
+              window.instant.edit.init(/*default spliter position*/ #{JSON.parse(gist.files["instant.json"].content).code_width || false} );
+            }
+          );
+        }
+      }
+    });
+
+

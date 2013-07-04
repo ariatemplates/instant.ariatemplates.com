@@ -1,0 +1,53 @@
+
+icons = { 'info': 'info', 'error': 'exclamation-sign' }
+
+mixin list_type(type, msgs)
+  div(class=type)
+    .wrapper
+      h2
+        i(class="icon-"+icons[type])
+        | #{type}
+      while msgs.length > 0
+        mixin message(msgs.shift())
+    a(href="#", onclick="window.flash.hide_flash(this.parentNode); return false").dismiss
+      i.icon-remove
+      | dismiss
+
+mixin message(meta)
+  p !{meta[0]}
+
+if !messages.is_empty()
+  #flash.flash.flash-hidden
+    each msgs, type in messages()
+      if (msgs && msgs.length > 0)
+        mixin list_type(type, msgs)
+
+  block flash_scripts
+    script(type="text/javascript")
+      (function(exports) {
+        var $ = function(id) {return document.getElementById(id); }, flash,
+          show_timeout = 250, hide_timeout = 10000,
+          sde = !{messages.is_empty()}; //sde: Should Display Errors
+
+        var show_flash = function() {
+          flash.classList.toggle("flash-hidden");
+          return false;
+        }
+        var hide_flash = function(elem) {
+          if (elem) {
+            return elem.classList.add("hidden");
+          }
+          flash.classList.toggle("flash-hidden");
+        }
+
+        if (sde) {
+          flash = $("flash");
+          window.setTimeout(show_flash, show_timeout);
+          window.setTimeout(hide_flash, hide_timeout);
+        }
+
+        exports.flash = {
+          'hide_flash': hide_flash
+        };
+
+      })(window);

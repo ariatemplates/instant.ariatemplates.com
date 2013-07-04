@@ -1,0 +1,105 @@
+doctype 5
+html
+  head
+    title Instant AriaTemplates
+    meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
+    meta(http-equiv="X-UA-Compatible",content="chrome=1")
+    link(rel="shorcut icon", type="image/x-icon", href="/favicon.ico")
+    link(href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,400italic,500italic,700italic', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', href='/css/font-awesome.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+    script(type="text/javascript", src="/lib/keymage.min.js")
+    script(type="text/javascript", src="/lib/majax.min.js")
+    script(type="text/javascript", src="/lib/ZeroClipboard.min.js")
+    script(type="text/javascript", src='/lib/polyfills/requestAnimationFrame.js')
+    //if lte IE 9
+      script(type="text/javascript", src='/lib/polyfills/classList.min.js')
+    //if lte IE 8
+      script(type="text/javascript", src='/lib/polyfills/array.indexof.ie8.min.js')
+    block header_scripts
+
+  body(class=template_name(filename))
+
+    include errors
+
+    header
+      h1.logo
+        span.key {{}}
+        a(href="/") Instant AriaTemplates
+      div.header
+        block header
+      nav
+          .item.menu.locals.right.hidden
+            i.icon-folder-open(title="We detected local instants that have been created from this computer")
+            ul
+          if (!everyauth.loggedIn)
+            .item.menu.login.right
+              a(href="/login") Login
+              ul
+                li.info
+                  div Log yourself using
+                  a(href="/login"): img(src="/images/github.png")
+          else
+            .user-info.item.menu.right
+              img.avatar.right(src=user.avatar)
+              if (template_name(filename) != "instant")
+                div.name
+                  div= user.name
+                  div @#{user.login}
+              ul
+                li.separator: a(href="/new") Create a new instant
+                li.separator: a(href="/"+user.login) My Instants list
+                li: a(href="/logout") Logout
+
+
+    .content-wrapper
+      .content
+        block content
+
+    footer.site-footer
+      .right
+        block footer_right
+          a(href="/terms") Terms of use
+
+      .left
+        block footer_left
+          span &copy;2013 Aria Templates
+
+      .footer
+        block footer
+
+    #help.help.background
+      .wrapper
+        header
+          h2 Keyboard Shortcuts
+          span ESC to close
+        block keyboard_help
+          include keyboard_help
+
+
+    script(type="text/javascript", src="/scripts/instant.js")
+    script(type="text/javascript", src="/scripts/local_instants.js")
+    if (locals.new_instant)
+      script(type="text/javascript")
+        // Adding new instant to localStorage
+        window.locals.add("!{gist.id}", "!{gist.admin_hash}", "!{gist.name}");
+
+    script(type="text/javascript")
+      // Locals instant initialisation
+      window.locals.init(!{everyauth.loggedIn}, '!{template_name(filename) === "instant" ? gist.id : false}');
+
+      // Global keyboard shortcuts
+      keymage('defmod-i', function() { window.location = '!{everyauth.loggedIn ? "/new" : "/anonymous/new"}'; return false; });
+
+    block scripts
+
+    block flash_scripts
+
+    script(type="text/javascript")
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-29575860-2', 'ariatemplates.com');
+      ga('send', 'pageview');

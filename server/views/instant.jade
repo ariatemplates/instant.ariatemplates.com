@@ -1,0 +1,105 @@
+extends layout
+
+block header_scripts
+  script(type="text/javascript", src='/aria/ariatemplates-1.4.4.js')
+  script(type="text/javascript", src='/aria/css/atskin-1.4.4.js')
+
+block header
+  if everyauth.loggedIn
+    if gist.user.login == user.login
+      .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.edit.save(this)")
+        i.icon-save
+        span Save
+      .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.delete(this)")
+        i.icon-trash
+        span Delete
+    if gist.user.login !== user.login
+      //- a.action(href="/"+gist.user.login+"/"+gist.id+"/fork")
+      //-   i.icon-code-fork
+      //-   span Fork
+      if (is_starred(gist.id))
+        .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.unstar(this)")
+          i.icon-star
+          span Unstar
+      else
+        .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.star(this)")
+          i.icon-star-empty
+          span Star
+  //- .action.menu
+  //-   i.icon-share
+  //-   span Share
+  //-   ul
+  //-     li Share on twitter
+  //-     li Copy the url
+
+
+mixin editor(title, type, file, content)
+  .panel(class=type)
+    header
+      h3 <i class="icon-code"></i> #{title}
+      .actions
+        i.icon-resize-full(title="Expand to full height", onclick="window.instant.edit.fullscreen('#{type}', this)")
+    if content
+      .code-wrap(id=type+"-editor")= content || get_default_content(type)
+    else
+      .code-wrap(id=type+"-editor")= (file && file.content) || get_default_content(type)
+
+block content
+  #splitter.splitter
+  #splitter-proxy.splitter-proxy.splitter-proxy-hidden
+  #code.code
+    mixin editor("Template", "tpl", gist.files["InstantTemplate.tpl"])
+    mixin editor("Template Script", "script", gist.files["InstantTemplateScript.js"])
+    mixin editor("CSS Template", "style", gist.files["InstantTemplateStyle.tpl.css"])
+    mixin editor("Data Model", "data", null, JSON.stringify(JSON.parse(gist.files["instant.json"].content).data, null, 2))
+
+  #preview-wrapper.preview
+    #preview.preview-wrapper
+
+prepend footer_right
+  span.link.kdb-help(title="Show keyboard shorcuts"): i.icon-keyboard(onclick="window.instant.show_keyboard_help()")
+
+block footer
+  span instant by
+  span: a(href="/" + gist.user.login)= gist.user.login
+  &bull;
+  if gist.forks.length > 0
+    span #{gist.forks.length} forks
+  else
+    span no forks
+  &bull;
+  span: a(href="https://gist.github.com/#{gist.user.login}/#{gist.id}#comments", target="_blank") #{gist.comments ? 1 : gist.comments} comments
+  if gist.history.length > 0
+    &bull;
+    span #{gist.history.length} revisions
+
+
+
+block scripts
+  script(type="text/javascript", src="/lib/ace/ace.js", charset="utf-8")
+  script(type="text/javascript", src="/scripts/splitter.js")
+  script(type="text/javascript", src="/scripts/errors.js")
+  script(type="text/javascript", src="/scripts/edit.js")
+  script(type="text/javascript")
+    aria.core.AppEnvironment.setEnvironment({
+      defaultWidgetLibs : {
+        "aria" : "aria.widgets.AriaLib",
+        "html" : "aria.html.HtmlLibrary"
+      }
+    });
+    Aria.load({
+      classes:["aria.templates.CSSClassGenerator"],
+      oncomplete:{
+        fn: function () {
+          // loading fake template to get necessary dependencies
+          Aria.loadTemplate(
+            { classpath: "A", div: "preview", data:{}},
+            function() {
+              window.instant.edit.init(/*default spliter position*/ #{JSON.parse(gist.files["instant.json"].content).code_width || false} );
+            }
+          );
+        }
+      }
+    });
+
+

@@ -1,0 +1,91 @@
+extends layout
+
+
+mixin list(gists)
+  table
+    thead
+      th
+      th description
+      th
+      th
+      if everyauth.loggedIn
+        th
+      th.author author
+    tbody
+      each gist in gists
+        tr
+          td.date(title=date(gist.created_at,date_patterns.full))= date(gist.created_at,"MMM DD")
+          td
+            div.name: a(href="/#{gist.user.login}/#{gist.id}")= gist.instant_name
+            .description !{linkify(gist.instant_description)}
+          td.comments(title="Number of comments")
+            if (gist.comments > 1)
+              span= gist.comments
+              i.icon-comments
+
+          td.forks(title="Number of forks")
+            if (gist.forks && gist.forks.length > 1)
+              span= gist.forks.length
+              i.icon-code-fork.icon-flip-vertical
+
+          if everyauth.loggedIn
+            td.starred
+              if user_info
+                if (is_starred(gist.id))
+                  span(title="Remove from your favorites", data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.unstar(this)")
+                    i.icon-star
+                else
+                  span(title="Add to your favorites", data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.star(this)")
+                    i.icon-star-empty
+              else
+                if gist.user.login !== user.login
+                  a.icon-star(href="/" + gist.user.login + "/" + gist.id + "/unstar", title="Remove from your favorites")
+
+                else
+                  i.icon-trash(title="Delete this instant forever!", data-id=gist.id, data-user-login=gist.user.login, onclick="window.iat.delete(this)")
+
+          if everyauth.loggedIn && gist.user.login === user.login
+            td.author You
+          else
+            td.author
+              a(href="/"+gist.user.login)= gist.user.login
+
+block content
+  if user_info
+    .details
+      img.avatar(src=user_info.avatar_url+"&s=400")
+      h1= user_info.name
+      .user-info
+        .login @#{user_info.login}
+        if (user_info.location)
+          .location= user_info.location
+        if (user_info.bio)
+          .bio= user_info.bio
+
+  .list
+    if (public_gists || starred_gists)
+      if (public_gists.length > 0)
+        if !user_info
+          h1 Your instants
+          mixin list(public_gists)
+        else
+          h1 The list
+          mixin list(public_gists)
+      else
+        h1 You don't have any instant!
+        table: tbody: tr
+          td.no-instant
+            a.button.button-blue(href="/new") don't wait any longer, create a new one now!
+      if (starred_gists && starred_gists.length > 0)
+        h1 Your starred instants
+        mixin list(starred_gists)
+    else
+      .no-instant.user
+        if (user_info)
+          h1 <span class="highlight">#{user_info.name || user_info.login}</span> doesn't have any instant !
+        else
+          h1 Want to have some fun ? Start playing with Instant Aria Templates now!
+          p: a.button.button-blue(href="/new") Create a new instant
+
+block scripts
+  script(type="text/javascript", src="/scripts/list.js")

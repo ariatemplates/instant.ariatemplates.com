@@ -1,0 +1,9 @@
+{
+  "port": 4000,
+  "github": {
+    "client_id": "<your client id here>",
+    "client_secret": "<your client secret here>",
+    "anonymous_token": "<API token of a GH user to use as anonymous instant host>"
+  }
+}
+

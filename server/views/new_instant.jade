@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  action = "/new"
+  if !everyauth.loggedIn
+    action = "/anonymous/new"
+    p.
+      This instant is going to be <em>anonymous</em>. The content will be persisted remotely
+      but the url will only be remembered locally on this computer.
+    p URL for instants created locally are listed via the top right <i class="icon-folder-open"></i> menu.
+
+  h1 New instant
+  h3 Give us a few information
+  form(method="POST", action=action)
+    div
+      if (locals.name)
+        input(type="text", name="name", placeholder="Name your instant", value=name)
+      else
+        input(type="text", name="name", placeholder="Name your instant")
+    div
+      if (locals.description)
+        textarea(name="description", placeholder="Describe it", rows="4")= description
+      else
+        textarea(name="description", placeholder="Describe it", rows="4")
+    input.button.button-blue(type="submit", value="Create")

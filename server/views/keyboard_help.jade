@@ -1,0 +1,38 @@
+mixin key(desc, keys)
+  tr.item
+    td.shortcut
+      each key in keys
+        i= key
+    td.desc= desc
+
+
+div
+  section
+    h3 Global
+    table
+      tbody
+        mixin key("Show this help", ["CTRL", "SHIFT", "?"])
+        mixin key("Create a new instant", ["CTRL", "I"])
+        mixin key("Save an instant", ["CTRL", "S"])
+
+  section
+    h3 Editor Navigation
+    table
+      tbody
+        mixin key("Go to Template editor", ["CTRL", "1"])
+        mixin key("Go to Template Script editor", ["CTRL", "2"])
+        mixin key("Go to Template Style editor", ["CTRL", "3"])
+        mixin key("Go to Data Model editor", ["CTRL", "4"])
+        mixin key("Go back to split view", ["ESC"])
+
+  section
+    h3
+      | Editor
+      a(href="https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts", target="_blank") official ACE Documentation
+    table
+      tbody
+        mixin key("Go to line", ["CTRL", "L"])
+        mixin key("Find", ["CTRL", "F"])
+        mixin key("Find / Replace", ["CTRL", "H"])
+        mixin key("Toggle comment", ["CTRL", "/"])
+
