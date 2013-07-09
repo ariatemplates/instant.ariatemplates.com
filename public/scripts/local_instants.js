@@ -31,10 +31,19 @@
     setLocals(locals);
   };
 
+  var delete_local = function(elem) {
+    var id = elem.dataset.id, choice =  window.confirm("Are you sure you want to delete this instant ?\nYou won't be able to retrieve it anymore.");
+    if (choice) {
+      remove(id);
+      header.removeChild(elem.parentNode);
+    }
+  };
+
   var appendItem = function(item, first, last) {
     var instant = document.createElement('li');
     instant.innerHTML = ["<a href='/anonymous/"+item.id+"/"+item.admin_hash+"' title='"+(item.description || "")+"'>",
       "<i class='left icon-file-text'></i>",
+      "<i class='right icon-trash' data-id='"+item.id+"' title='Remove from this list' onclick='window.locals.delete(this); return false;'></i>",
       item.name,
     "</a>"].join("");
 
@@ -97,6 +106,7 @@
   exports.locals = {
     'init': init,
     'add': add,
+    'delete': delete_local,
     'remove': remove
   };
 

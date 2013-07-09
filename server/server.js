@@ -264,9 +264,9 @@ app.post("/anonymous/new", getGistme, function(req, res) {
     'public': false,
     files: {
       "instant.json": { 'content': JSON.stringify(metadata,null, 2)+"\n" },
-      "Template.tpl": { 'content': app.locals.get_default_content("TPL") },
-      "TemplateScript.js": { 'content': app.locals.get_default_content("SCRIPT") },
-      "TemplateStyle.tpl.css": { 'content': app.locals.get_default_content("STYLE") }
+      "InstantTemplate.tpl": { 'content': app.locals.get_default_content("TPL") },
+      "InstantTemplateScript.js": { 'content': app.locals.get_default_content("SCRIPT") },
+      "InstantTemplateStyle.tpl.css": { 'content': app.locals.get_default_content("STYLE") }
     }
   };
 
@@ -325,7 +325,7 @@ app.post("/new", userMustBeLoggedIn, getGistme, function(req, res) {
     // To prevent being considered as a spammy bot by Github Hubot
     setTimeout(function() {
       createInitialComment(gistme, gist);
-    }, 750);
+    }, 1000);
 
     res.redirect("/" + gist.user.login + "/" + gist.id);
   });
@@ -430,6 +430,43 @@ app.get("/anonymous/:instant_id/:admin_hash", getGistme, function(req, res, next
   });
 });
 
+app.post("/anonymous/:instant_id/:admin_hash", getGistme, function(req, res, next) {
+  var tpl    = req.body.tpl,
+      script = req.body.script,
+      style  = req.body.style,
+      data   = req.body.data,
+      instant_id = req.param('instant_id'),
+      admin_hash = req.param('admin_hash'),
+      metadata, fetch_admin_hash, instant_json;
+
+  gistme.setToken(config.github.anonymous_token);
+  gistme.fetch(instant_id, function(error, gist) {
+    instant_json = JSON.parse(gist.files["instant.json"].content);
+    instant_json.data = JSON.parse(data);
+
+    fetch_admin_hash = instant_json.admin_hash;
+    if (fetch_admin_hash !== admin_hash) {
+      return res.send(401, "Wrong credentials. You can not update this anonymous gist.");
+    }
+
+    metadata = {
+      files: {
+        "instant.json": { 'content': JSON.stringify(instant_json, null, 2)+"\n" },
+        "InstantTemplate.tpl": { 'content': tpl },
+        "InstantTemplateScript.js": { 'content': script },
+        "InstantTemplateStyle.tpl.css": { 'content': style }
+      }
+    };
+
+    gistme.update(instant_id, metadata, function(error, new_gist) {
+      if (error) {
+        return next(new Error(error.message));
+      }
+      res.json({'ok': true});
+    });
+  });
+});
+
 app.get("/:username/:instant_id", getGistme, function(req, res, next) {
   var gistme = req.gistme, username = req.param('username'), instant_id = req.param('instant_id');
   gistme.fetch(instant_id, function(error, gist) {
@@ -512,20 +549,26 @@ app['delete']("/:username/:instant_id", userMustBeLoggedIn, getGistme, function(
   gistme.fetch(instant_id, function(error, gist) {
     if (gist.user.login !== username) {
       return res.json({
-        "error": "Whoops... Seems you are trying to do o_O stuff! <strong>You should not!</strong>"
+        "error": {
+          "message": "Whoops... Seems you are trying to do o_O stuff! <strong>You should not!</strong>"
+        }
       });
     }
 
     if (gist.user.login !== loggedUserLogin) {
       return res.json({
-        "error": "The instant #" + instant_id + " is not one of yours. You can't delete it !"
+        "error":  {
+          "message": "The instant #" + instant_id + " is not one of yours. You can't delete it !"
+        }
       });
     }
 
     gistme['delete'](instant_id, function(error, deleted) {
       if (!deleted) {
         return res.json({
-          "error": "We apparently did not manage to delete the instant #"+instant_id
+          "error": {
+            "message": "We apparently did not manage to delete the instant #"+instant_id
+          }
         });
       }
       return res.json({ "ok": true });

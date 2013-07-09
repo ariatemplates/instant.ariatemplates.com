@@ -10,6 +10,9 @@ block header
         input(type="hidden", name="_method", value="delete")
         i.icon-trash
         span Delete
+    .action(data-id=gist.id, data-admin-hash=gist.admin_hash, onclick="window.instant.edit.save_anonymous(this)")
+      i.icon-save
+      span Save
 
     #share.action.menu
       i.icon-share

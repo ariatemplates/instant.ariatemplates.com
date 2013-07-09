@@ -59,7 +59,14 @@
         url: "/" + userLogin + "/" + instant_id,
         method: "DELETE"
       }, function(response) {
-
+        if (response.ok) {
+          if (~window.location.indexOf(instant_id)) {
+            window.location = "/" + userLogin;
+          }
+        } else {
+          console.error(response.error.message);
+          alert(response.error.message);
+        }
       });
     }
   };
@@ -79,6 +86,7 @@
         }
       } else {
         console.error(response.error.message);
+        alert(response.error.message);
       }
     });
   };

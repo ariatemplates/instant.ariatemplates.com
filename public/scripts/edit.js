@@ -252,7 +252,35 @@
       },
       data: JSON.stringify(data)
     }, function(response) {
+      if (response.ok) {
+        var icon = elem.getElementsByTagName("i")[0];
+        icon.classList.remove('icon-save');
+        icon.classList.add('icon-ok');
+        setTimeout(function () {
+          icon.classList.remove('icon-ok');
+          icon.classList.add('icon-save');
+        }, 2000);
+      }
+    });
+  };
 
+  var save_anonymous_instant = function(elem) {
+    var instant_id = elem.dataset.id, admin_hash = elem.dataset.adminHash;
+    var data = {
+      tpl: getEditor("tpl").getValue(),
+      script: getEditor("script").getValue(),
+      style: getEditor("style").getValue(),
+      data: JSON.stringify(loadModel())
+    };
+    instant.at_ajax({
+      url: "/anonymous/" + instant_id + "/" + admin_hash,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8"
+      },
+      data: JSON.stringify(data)
+    }, function(response) {
+      console.log(response);
     });
   };
 
@@ -261,6 +289,7 @@
     'fullscreen': fullscreen,
     'onSplitterReleased': on_splitter_released,
     'save': save_instant,
+    'save_anonymous': save_anonymous_instant,
     'editor': getEditor
   };
 })(window.instant);
