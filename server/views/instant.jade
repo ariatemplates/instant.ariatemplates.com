@@ -6,23 +6,23 @@ block header_scripts
 
 block header
   if everyauth.loggedIn
-    if gist.user.login == user.login
-      .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.edit.save(this)")
+    if gist.owner.login == user.login
+      .action(data-id=gist.id, data-user-login=gist.owner.login, onclick="window.instant.edit.save(this)")
         i.icon-save
         span Save
-      .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.delete(this)")
+      .action(data-id=gist.id, data-user-login=gist.owner.login, onclick="window.instant.delete(this)")
         i.icon-trash
         span Delete
-    if gist.user.login !== user.login
-      //- a.action(href="/"+gist.user.login+"/"+gist.id+"/fork")
+    if gist.owner.login !== user.login
+      //- a.action(href="/"+gist.owner.login+"/"+gist.id+"/fork")
       //-   i.icon-code-fork
       //-   span Fork
       if (is_starred(gist.id))
-        .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.unstar(this)")
+        .action(data-id=gist.id, data-user-login=gist.owner.login, onclick="window.instant.unstar(this)")
           i.icon-star
           span Unstar
       else
-        .action(data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.star(this)")
+        .action(data-id=gist.id, data-user-login=gist.owner.login, onclick="window.instant.star(this)")
           i.icon-star-empty
           span Star
   //- .action.menu
@@ -61,14 +61,14 @@ prepend footer_right
 
 block footer
   span instant by
-  span: a(href="/" + gist.user.login)= gist.user.login
+  span: a(href="/" + gist.owner.login)= gist.owner.login
   &bull;
   if gist.forks.length > 0
     span #{gist.forks.length} forks
   else
     span no forks
   &bull;
-  span: a(href="https://gist.github.com/#{gist.user.login}/#{gist.id}#comments", target="_blank") #{gist.comments ? 1 : gist.comments} comments
+  span: a(href="https://gist.github.com/#{gist.owner.login}/#{gist.id}#comments", target="_blank") #{gist.comments ? 1 : gist.comments} comments
   if gist.history.length > 0
     &bull;
     span #{gist.history.length} revisions
