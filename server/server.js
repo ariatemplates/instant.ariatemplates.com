@@ -203,7 +203,7 @@ var getInstantStarredGists = function(gistme, callback) {
 };
 
 var createInitialComment = function(gistme, gist) {
-    initial_comment = "Created by Instant Aria Templates, viewable on http://instant.ariatemplates.com/" + gist.user.login + "/" + gist.id;
+    initial_comment = "Created by Instant Aria Templates, viewable on http://instant.ariatemplates.com/" + gist.owner.login + "/" + gist.id;
     gistme.comment_create(gist.id, initial_comment, function(error, comment) {
       if (error) {
         console.error("Error while creating the initial comment for gist#"+gist.id, JSON.stringify(error));
@@ -327,7 +327,7 @@ app.post("/new", userMustBeLoggedIn, getGistme, function(req, res) {
       createInitialComment(gistme, gist);
     }, 1000);
 
-    res.redirect("/" + gist.user.login + "/" + gist.id);
+    res.redirect("/" + gist.owner.login + "/" + gist.id);
   });
 });
 
@@ -547,7 +547,7 @@ app['delete']("/:username/:instant_id", userMustBeLoggedIn, getGistme, function(
       loggedUserLogin = req.user.login;
 
   gistme.fetch(instant_id, function(error, gist) {
-    if (gist.user.login !== username) {
+    if (gist.owner.login !== username) {
       return res.json({
         "error": {
           "message": "Whoops... Seems you are trying to do o_O stuff! <strong>You should not!</strong>"
@@ -555,7 +555,7 @@ app['delete']("/:username/:instant_id", userMustBeLoggedIn, getGistme, function(
       });
     }
 
-    if (gist.user.login !== loggedUserLogin) {
+    if (gist.owner.login !== loggedUserLogin) {
       return res.json({
         "error":  {
           "message": "The instant #" + instant_id + " is not one of yours. You can't delete it !"

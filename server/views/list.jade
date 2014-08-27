@@ -16,7 +16,7 @@ mixin list(gists)
         tr
           td.date(title=date(gist.created_at,date_patterns.full))= date(gist.created_at,"MMM DD")
           td
-            div.name: a(href="/#{gist.user.login}/#{gist.id}")= gist.instant_name
+            div.name: a(href="/#{gist.owner.login}/#{gist.id}")= gist.instant_name
             .description !{linkify(gist.instant_description)}
           td.comments(title="Number of comments")
             if (gist.comments > 1)
@@ -32,23 +32,23 @@ mixin list(gists)
             td.starred
               if user_info
                 if (is_starred(gist.id))
-                  span(title="Remove from your favorites", data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.unstar(this)")
+                  span(title="Remove from your favorites", data-id=gist.id, data-user-login=gist.owner.login, onclick="window.instant.unstar(this)")
                     i.icon-star
                 else
-                  span(title="Add to your favorites", data-id=gist.id, data-user-login=gist.user.login, onclick="window.instant.star(this)")
+                  span(title="Add to your favorites", data-id=gist.id, data-user-login=gist.owner.login, onclick="window.instant.star(this)")
                     i.icon-star-empty
               else
-                if gist.user.login !== user.login
-                  a.icon-star(href="/" + gist.user.login + "/" + gist.id + "/unstar", title="Remove from your favorites")
+                if gist.owner.login !== user.login
+                  a.icon-star(href="/" + gist.owner.login + "/" + gist.id + "/unstar", title="Remove from your favorites")
 
                 else
-                  i.icon-trash(title="Delete this instant forever!", data-id=gist.id, data-user-login=gist.user.login, onclick="window.iat.delete(this)")
+                  i.icon-trash(title="Delete this instant forever!", data-id=gist.id, data-user-login=gist.owner.login, onclick="window.iat.delete(this)")
 
-          if everyauth.loggedIn && gist.user.login === user.login
+          if everyauth.loggedIn && gist.owner.login === user.login
             td.author You
           else
             td.author
-              a(href="/"+gist.user.login)= gist.user.login
+              a(href="/"+gist.owner.login)= gist.owner.login
 
 block content
   if user_info
