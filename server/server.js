@@ -211,6 +211,17 @@ var createInitialComment = function(gistme, gist) {
     });
 };
 
+var getAtVersion = function(req) {
+    var atversion = req.query.atversion;
+    // minimal validation:
+    if (!atversion || !/^[-\.0-9a-zA-Z]+$/.test(atversion)) {
+        atversion = "latest";
+    }
+    return {
+        display: atversion.replace(/^(\d)(\d)(\d{1,2})$/, "$1.$2.$3"),
+        value: atversion.replace(/^(\d)\.(\d)\.(\d{1,2})$/, "$1$2$3")
+    };
+};
 
 /* EXPRESS ROUTES */
 var file_404 = function(req, res) {
@@ -387,7 +398,8 @@ app.get("/anonymous/:instant_id", getGistme, function(req, res, next) {
     }
     res.render("anonymous_instant", {
       'admin': false,
-      'gist': gist
+      'gist': gist,
+      'atversion': getAtVersion(req)
     });
   });
 });
@@ -425,7 +437,8 @@ app.get("/anonymous/:instant_id/:admin_hash", getGistme, function(req, res, next
     res.render("anonymous_instant", {
       'admin': true,
       'gist': gist,
-      'new_instant': new_anonymous
+      'new_instant': new_anonymous,
+      'atversion': getAtVersion(req)
     });
   });
 });
@@ -477,7 +490,8 @@ app.get("/:username/:instant_id", getGistme, function(req, res, next) {
       return next(new Error());
     }
     res.render("instant", {
-      'gist': gist
+      'gist': gist,
+      'atversion': getAtVersion(req)
     });
   });
 });
