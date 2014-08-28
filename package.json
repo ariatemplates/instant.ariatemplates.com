@@ -1,23 +1,23 @@
 {
-    "name": "instant-ariatemplates",
-    "version": "0.1.0",
-    "private": true,
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/ariatemplates/instant.ariatemplates.com.git"
-    },
-    "dependencies": {
-        "connect-flash": "0.1.1",
-        "express": "3.2.6",
-        "everyauth": "0.4.3",
-        "jade": "0.28.0",
-        "less-middleware": "0.1.9",
-        "request": "2.21.0",
-        "moment": "2.0.0",
-        "async": "0.2.9"
-    },
-    "devDependencies": {
-        "grunt": "~0.4.1",
-        "grunt-contrib-less": "0.6.3"
-    }
+  "name": "instant-ariatemplates",
+  "version": "0.2.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ariatemplates/instant.ariatemplates.com.git"
+  },
+  "dependencies": {
+    "connect-flash": "0.1.1",
+    "express": "3.2.6",
+    "everyauth": "0.4.3",
+    "jade": "0.28.0",
+    "less-middleware": "0.1.9",
+    "request": "2.21.0",
+    "moment": "2.0.0",
+    "async": "0.2.9"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-less": "0.6.3"
+  }
 }
