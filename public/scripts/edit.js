@@ -77,30 +77,6 @@
     elem.style[positionName] = value + "px";
   };
 
-
-  var loadTemplate = function() {
-    var tpl_content = getEditor('tpl').getValue(),
-        data = loadModel();
-    var tplString = "{Template {$classpath : 'InstantTemplate', $hasScript:true, $css:['InstantTemplateStyle']}}"+tpl_content+"{/Template}";
-    aria.templates.TplClassGenerator.parseTemplate(tplString, false, {
-        fn : function (res, args) {
-          if (res.classDef) {
-            errors_manager.removeError("tpl");
-            loadTemplateInPreview(res.classDef, data);
-          }
-        }
-      },{ "file_classpath" : "InstantTemplate" }
-    );
-  };
-  var loadTemplateInPreview = function(classDef, data) {
-    aria.core.ClassMgr.$on({
-      "classComplete": {
-        fn : onTemplateLoaded, args: data, scope : window
-      }
-    });
-    Aria["eval"](classDef);
-  };
-
   var loadModel = function() {
     try {
       //errors.removeError("data");
@@ -112,43 +88,21 @@
     return data;
   };
 
+  var loadTemplate = function() {
+    var tpl_content = getEditor('tpl').getValue();
+    var tplString = "{Template {$classpath : 'InstantTemplate', $hasScript:true, $css:['InstantTemplateStyle']}}"+tpl_content+"{/Template}";
+    aria.core.DownloadMgr.loadFileContent("InstantTemplate.tpl", tplString);
+  };
+
   var loadTemplateScript = function() {
     var script_content = getEditor('script').getValue();
-    try {
-      eval("Aria.tplScriptDefinition("+script_content+");");
-      //errors.removeError("script");
-    } catch (e) {
-      //errors.setError("script", "[SCRIPT ERROR] : " + e.message);
-    }
+    aria.core.DownloadMgr.loadFileContent("InstantTemplateScript.js", "Aria.tplScriptDefinition("+script_content+");");
   };
-  var onTemplateLoaded = function(evt, data) {
-    if (evt.refClasspath == "InstantTemplate") {
-      Aria.loadTemplate({
-        classpath: "InstantTemplate",
-        div: "preview",
-        data: data
-      });
-      aria.core.ClassMgr.$removeListeners({
-        "classComplete": {
-          fn : onTemplateLoaded, scope : window
-        }
-      });
-    }
-  };
+
   var loadTemplateStyle = function () {
     var css_content = getEditor('style').getValue();
     var tplString = "{CSSTemplate {$classpath : 'InstantTemplateStyle'}}"+css_content+"{/CSSTemplate}";
-    aria.templates.CSSClassGenerator.parseTemplate(tplString, false, {
-        fn : function (res, args) {
-          if (res.classDef) {
-            errors_manager.removeError("style");
-            Aria["eval"](res.classDef);
-          } else {
-            errors_manager.setError("style", "[STYLE ERROR] : " + e.message);
-          }
-        }
-      },{ "file_classpath" : "InstantTemplateStyle" }
-    );
+    aria.core.DownloadMgr.loadFileContent("InstantTemplateStyle.tpl.css", tplString);
   };
 
   // Refresh preview from model
@@ -159,10 +113,16 @@
     } catch (o_O) {
       // I can haz lazyness
     }
-    loadModel();
+    errors_manager.removeAllErrors();
+    var data = loadModel();
     loadTemplateScript();
     loadTemplateStyle();
     loadTemplate();
+    Aria.loadTemplate({
+      classpath: "InstantTemplate",
+      div: "preview",
+      data: data
+    });
   };
 
 

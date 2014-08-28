@@ -22,6 +22,11 @@ ErrorsManager.prototype.setError = function (type, content) {
 
 ErrorsManager.prototype.removeError = function (type) {
   this.setError(type, false);
+};
+
+ErrorsManager.prototype.removeAllErrors = function () {
+  this.errors["tpl"] = false;
+  this.errors["style"] = false;
   this.refreshErrors();
 };
 
