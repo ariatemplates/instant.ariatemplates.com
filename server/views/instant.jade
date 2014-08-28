@@ -1,8 +1,7 @@
 extends layout
 
 block header_scripts
-  script(type="text/javascript", src='/aria/ariatemplates-1.4.4.js')
-  script(type="text/javascript", src='/aria/css/atskin-1.4.4.js')
+  script(type="text/javascript", src='http://cdn.ariatemplates.com/at'+atversion.value+'.js?skin')
 
 block header
   if everyauth.loggedIn
@@ -56,6 +55,11 @@ block content
   #preview-wrapper.preview
     #preview.preview-wrapper
 
+append footer_left
+  span Version:&nbsp;
+    select#atversion(onchange="instant.atVersion.change()")
+      option(value=atversion.value) #{atversion.display}
+
 prepend footer_right
   span.link.kdb-help(title="Show keyboard shorcuts"): i.icon-keyboard(onclick="window.instant.show_keyboard_help()")
 
@@ -101,5 +105,6 @@ block scripts
         }
       }
     });
-
+  script(type="text/javascript", src="/scripts/atVersion.js")
+  script(type="text/javascript", src="http://cdn.ariatemplates.com/versions?callback=instant.atVersion.versions")
 
